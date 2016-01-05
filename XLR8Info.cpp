@@ -22,13 +22,16 @@
 
 #include "XLR8Info.h"
 
-XLR8Info::XLR8Info(void) : XBEnables(0) { // constructor
+XLR8Info::XLR8Info(void) : ImageNum(0),XBEnables(0) { // constructor
   // Find out which XLR8 blocks this design has
   getChipId();// Chip id comes out first from the CID register
   uint8_t i;
   uint8_t temp[4];
   for (i = 0; i < 4; ++i) {temp[i] = XLR8_CID;} // get XBEnables, read low byte first
   for (i = 0; i < 4; ++i) {XBEnables = (XBEnables<<8 | temp[3-i]);} // construct 32b value
+  // LSB is the image num
+  ImageNum = XBEnables & 1;
+  XBEnables = XBEnables >> 1;
 }
 XLR8Info::~XLR8Info() {} // nothing to destruct
 bool  XLR8Info::isVersionClean(void) {return XLR8_VERST == 0;}

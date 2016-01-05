@@ -46,6 +46,7 @@ class XLR8Info {
   bool  isVersionMixed(void);
   bool  isVersionModified(void);
   uint64_t getChipId(void);
+  inline uint8_t   getImageNum(void) {return ImageNum;} // variable is set by constructor
   inline uint32_t  getXBEnables(void) {return XBEnables;} // variable is set by constructor
   bool  hasBootRestore(void);
   bool  hasXLR8FloatAddSubMult(void);
@@ -54,6 +55,7 @@ class XLR8Info {
   bool  hasXLR8Servo(void);
   bool  hasXLR8NeoPixel(void);
   private:
+  uint8_t  ImageNum;
   uint32_t XBEnables;
   
 };

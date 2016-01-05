@@ -18,6 +18,8 @@ void setup() {
     temp64 = temp64 << 4; // move next nibble up to top
   }
   Serial.println("");
+  Serial.print("Image : ");
+  Serial.println(myXLR8.getImageNum());
   Serial.print("XB_ENABLE[6:0] = 0x");
   Serial.println(myXLR8.getXBEnables(),HEX);
   if (myXLR8.hasBootRestore())     {Serial.println(F("Has Boot Restore"));}
