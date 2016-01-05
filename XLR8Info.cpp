@@ -30,7 +30,7 @@ XLR8Info::XLR8Info(void) : ImageNum(0),XBEnables(0) { // constructor
   for (i = 0; i < 4; ++i) {temp[i] = XLR8_CID;} // get XBEnables, read low byte first
   for (i = 0; i < 4; ++i) {XBEnables = (XBEnables<<8 | temp[3-i]);} // construct 32b value
   // LSB is the image num
-  ImageNum = XBEnables & 1;
+  ImageNum = !(XBEnables & 1); // factory=1 is on image=0
   XBEnables = XBEnables >> 1;
 }
 XLR8Info::~XLR8Info() {} // nothing to destruct
