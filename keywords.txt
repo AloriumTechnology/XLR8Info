@@ -1,0 +1,29 @@
+#######################################
+# Syntax Coloring Map For XLR8Float
+####################################### 
+# Class
+#######################################
+
+XLR8Info	KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+
+getXLR8Version	KEYWORD2
+isVersionClean	KEYWORD2
+isVersionMixed	KEYWORD2
+isVersionModified	KEYWORD2
+getChipId	KEYWORD2
+getXBEnables	KEYWORD2
+hasBootRestore	KEYWORD2
+hasXLR8FloatAddSubMult	KEYWORD2
+hasXLR8FloatDiv	KEYWORD2
+hasXLR8FloatConvert	KEYWORD2
+hasXLR8Servo	KEYWORD2
+hasXLR8NeoPixel	KEYWORD2
+
+#######################################
+# Constants
+#######################################
+ 
