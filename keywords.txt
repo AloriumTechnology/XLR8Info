@@ -15,11 +15,13 @@ isVersionClean	KEYWORD2
 isVersionMixed	KEYWORD2
 isVersionModified	KEYWORD2
 getChipId	KEYWORD2
+getDesignConfig	KEYWORD2
+getImageNum	KEYWORD2
+getClockMHz	KEYWORD2
+hasFullProgMem	KEYWORD2
 getXBEnables	KEYWORD2
-hasBootRestore	KEYWORD2
 hasXLR8FloatAddSubMult	KEYWORD2
 hasXLR8FloatDiv	KEYWORD2
-hasXLR8FloatConvert	KEYWORD2
 hasXLR8Servo	KEYWORD2
 hasXLR8NeoPixel	KEYWORD2
 

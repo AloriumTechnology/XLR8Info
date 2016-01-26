@@ -31,6 +31,7 @@
 #  define XLR8_VERSH     _SFR_MEM8(0x91)
 #  define XLR8_VERST     _SFR_MEM8(0x92)
 #  define XLR8_CID       _SFR_MEM8(0xd8)
+#  define XLR8_CLKSPD    _SFR_IO8(0x29)
 #else
 #   warning "XLR8 Hardware not implemented for selected device"
 #endif
@@ -45,18 +46,19 @@ class XLR8Info {
   bool  isVersionClean(void);
   bool  isVersionMixed(void);
   bool  isVersionModified(void);
-  uint64_t getChipId(void);
-  inline uint8_t   getImageNum(void) {return ImageNum;} // variable is set by constructor
-  inline uint32_t  getXBEnables(void) {return XBEnables;} // variable is set by constructor
-  bool  hasBootRestore(void);
+  uint32_t getChipId(void);
+  uint8_t  getDesignConfig(void);
+  uint8_t  getImageNum(void);
+  uint8_t  getClockMHz(void);
+  bool  hasFullProgMem(void);
+  uint32_t getXBEnables(void);
   bool  hasXLR8FloatAddSubMult(void);
   bool  hasXLR8FloatDiv(void);
-  bool  hasXLR8FloatConvert(void);
   bool  hasXLR8Servo(void);
   bool  hasXLR8NeoPixel(void);
   private:
-  uint8_t  ImageNum;
-  uint32_t XBEnables;
+  uint8_t  designConfig;
+  uint16_t XBEnables;
   
 };
 
