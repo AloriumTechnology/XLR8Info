@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For XLR8Float
+# Syntax Coloring Map For XLR8Info
 ####################################### 
 # Class
 #######################################
@@ -24,6 +24,8 @@ hasXLR8FloatAddSubMult	KEYWORD2
 hasXLR8FloatDiv	KEYWORD2
 hasXLR8Servo	KEYWORD2
 hasXLR8NeoPixel	KEYWORD2
+enableInternalOscPin	KEYWORD2
+disableInternalOscPin	KEYWORD2
 
 #######################################
 # Constants

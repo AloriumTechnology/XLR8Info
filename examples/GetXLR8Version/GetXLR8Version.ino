@@ -1,4 +1,12 @@
 #include <XLR8Info.h>
+/* GetXLR8Version
+ Copyright (c) 2015-2016 Alorim Technology.  All right reserved.
+ by Matt Weber (linkedin.com/in/mattweber0) of
+ Alorium Technology (info@aloriumtech.com)
+ Reports information about the FPGA design currently
+  loaded on the XLR8 board
+*/
+  
 
 #define SAMPLES 129
 volatile uint8_t index;
@@ -13,7 +21,7 @@ void setup() {
   if (myXLR8.isVersionModified()) {Serial.println("  Modified working copy");}
   if (myXLR8.isVersionClean()) {Serial.println("  Clean working copy");}
   Serial.print("XLR8 CID = 0x");
-  Serial.println(myXLR8.getChipId());
+  Serial.println(myXLR8.getChipId(),HEX);
   Serial.print("DesignConfig = 0x");
   Serial.println(myXLR8.getDesignConfig());
   Serial.print("Image = ");
@@ -33,7 +41,7 @@ void setup() {
   //  to see how fast it is running. It comes out on pin 8 so we can use timer/counter1
   //  input capture function to measure it accurately.
   PRR &= ~(1 << 4); // Enable the oscillator (turn off power reduction on bit 4)
-  XLR8_CLKSPD |= 1; // send internal osc divide by 1024 to pin 8
+  myXLR8.enableInternalOscPin(); // send internal osc divide by 1024 to pin 8
   delay(10); // Let oscillator get started
   //ICP1 enable
   TCCR1A = 0;
@@ -49,7 +57,25 @@ void setup() {
   Serial.print(intOscSpeed);
   Serial.println(" MHz");
   Serial.flush();
+  myXLR8.disableInternalOscPin(); // send internal osc divide by 1024 to pin 8
+  PRR |= (1 << 4); // power down the internal oscillator
   GPIOR1 = 0xc0;
+  
+  // Post results to our product improvement page
+  Serial.println();
+  Serial.println(F("To help improve our products, please paste the followig URL into a web browser, add any notes, and click submit"));
+  Serial.print(F("https://docs.google.com/forms/d/1GCmN3hRF-fnkr0J8K8HBrYvmuhmz6y94ViadHgobeRQ/viewform?"));
+  Serial.print(F("entry.498366088="));Serial.print(F("(optional)")); // Board Number
+  Serial.print(F("&entry.110701079=0x"));Serial.print(myXLR8.getChipId(),HEX); // Chip ID
+  Serial.print(F("&entry.328279444="));Serial.print(myXLR8.getXLR8Version()); // subversion
+  Serial.print(F("&entry.1881676735="));Serial.print(myXLR8.getDesignConfig()); // Design Config
+  Serial.print(F("&entry.821741284="));Serial.print(myXLR8.getXBEnables()); // XB Enable
+  //Serial.print(F("&entry.1215707535="));Serial.print(); // Notes
+  Serial.print(F("&entry.545646289="));Serial.print(intOscSpeed); // Speed Test
+  Serial.println();
+  Serial.flush();
+  
+  
 }
 
 void loop() {

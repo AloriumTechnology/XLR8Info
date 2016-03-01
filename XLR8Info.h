@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------
  Copyright (c) 2015 Alorim Technology.  All right reserved.
  This library queries information from an XLR8 board.
- Written by Matt Weber (Matthew.D.Weber@ieee.org) of
+ Written by Matt Weber (linkedin.com/in/mattweberdesign) of
  Alorium Technology (info@aloriumtech.com)
 
  
@@ -16,7 +16,7 @@
  GNU Lesser General Public License for more details.
  
  You should have received a copy of the GNU Lesser General Public
- License along with XLR8 NeoPixel.  If not, see
+ License along with this library.  If not, see
  <http://www.gnu.org/licenses/>.
  --------------------------------------------------------------------*/
 
@@ -25,16 +25,8 @@
 #ifndef XLR8INFO_h
 #define XLR8INFO_h
 
-#if defined (__AVR_ATmega328P__)
-#  define XLR8_VERS      _SFR_MEM16(0x90)
-#  define XLR8_VERSL     _SFR_MEM8(0x90)
-#  define XLR8_VERSH     _SFR_MEM8(0x91)
-#  define XLR8_VERST     _SFR_MEM8(0x92)
-#  define XLR8_CID       _SFR_MEM8(0xd8)
-#  define XLR8_CLKSPD    _SFR_IO8(0x29)
-#else
-#   warning "XLR8 Hardware not implemented for selected device"
-#endif
+// #ARDUINO_XLR8 is passed from IDE to the compiler if XLR8 is selected properly
+#ifdef ARDUINO_XLR8
 
 class XLR8Info {
   public:
@@ -42,7 +34,7 @@ class XLR8Info {
   XLR8Info(void);
   ~XLR8Info();
   // Return information about the XLR8 board.
-  inline uint16_t getXLR8Version(void) {return XLR8_VERS;}
+  uint16_t getXLR8Version(void);
   bool  isVersionClean(void);
   bool  isVersionMixed(void);
   bool  isVersionModified(void);
@@ -56,10 +48,16 @@ class XLR8Info {
   bool  hasXLR8FloatDiv(void);
   bool  hasXLR8Servo(void);
   bool  hasXLR8NeoPixel(void);
+  void  enableInternalOscPin(void);
+  void  disableInternalOscPin(void);
   private:
   uint8_t  designConfig;
   uint16_t XBEnables;
+  bool     oldRegisters;
   
 };
 
+#else
+#error "XLR8Info library requires Tools->Board->XLR8xxx selection. Install boards from https://github.com/AloriumTechnology/Arduino_Boards"
+#endif
 #endif
