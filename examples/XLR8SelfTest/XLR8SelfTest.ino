@@ -22,6 +22,7 @@
   EEPROM signals
   IOREF
   decoupling caps are probably untestable
+ Wiring is really simple. Just wire from 3.3V to Aref and that's it.
 */
 
 #ifndef cbi
