@@ -5,16 +5,39 @@
  Alorium Technology (info@aloriumtech.com)
  Reports information about the FPGA design currently
   loaded on the XLR8 board
+ Set serial monitor to 115200 baud
 */
   
 
 #define SAMPLES 129
 volatile uint8_t index;
 volatile uint16_t timestamp[SAMPLES];
+XLR8Info myXLR8;
 
 void setup() {
-  XLR8Info myXLR8;
+  // Try a couple "wrong speeds" to help people figure out if they have a 
+  //  Tools->FPGA Image selection that doesn't match what's actually on the board
+  //  
+  Serial.begin(57600);
+  Serial.println("***************");
+  Serial.println("Error, Change Tools->FPGA Image to a selection with the following MHz");
+  printImageName(Serial);
+  Serial.println("***************");
+  Serial.flush();
+  Serial.begin(230400);
+  Serial.println();
+  Serial.println("***************");
+  Serial.println("Error, Change Tools->FPGA Image to a selection with the following MHz");
+  printImageName(Serial);
+  Serial.println("***************");
+  Serial.flush();
   Serial.begin(115200);
+  Serial.println();
+  Serial.println();
+  Serial.println("***************");
+  printImageName(Serial);
+  Serial.println("***************");
+  Serial.flush();
   Serial.print("XLR8 Hardware Version Number = ");
   Serial.println(myXLR8.getXLR8Version());
   if (myXLR8.isVersionMixed()) {Serial.println("  Mixed version, lowest reported");}
@@ -87,3 +110,13 @@ ISR(TIMER1_CAPT_vect) {
   }
 } 
 
+void printImageName(Stream &s) {
+  s.print("FPGA Image: ");
+  s.print(myXLR8.getClockMHz());
+  s.print(" MHz ");
+  if (myXLR8.hasXLR8FloatAddSubMult()) {s.print(F("Float "));}
+  if (myXLR8.hasXLR8Servo())           {s.print(F("Servo "));}
+  if (myXLR8.hasXLR8NeoPixel())        {s.print(F("NeoPixel "));}
+  s.print(" 1.0.");
+  s.println(myXLR8.getXLR8Version());
+}
