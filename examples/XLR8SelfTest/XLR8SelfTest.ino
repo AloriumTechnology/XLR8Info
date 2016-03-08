@@ -73,7 +73,7 @@ uint16_t lowXrefh = 1023;
 uint16_t highXrefl = 0;
 uint16_t lowXrefl = 1023;
 
-#define INCLUDE_DEBUG
+//#define INCLUDE_DEBUG
 #ifdef INCLUDE_DEBUG
 const uint8_t numTestDebug = 40;
 uint8_t testDebug[numTestDebug];
@@ -365,29 +365,30 @@ void setup() {
   Serial.print(F("&entry.1215707535="));Serial.print("XLR8SelfTest"); // Notes
   Serial.print(F("&entry.545646289="));Serial.print(intOscSpeed); // Speed Test
   Serial.print(F("&entry.1561823473="));Serial.print(vccRead); // 5V supply measurement
-  Serial.print(F("&entry.882185102=Yes")); // Add test results
-  Serial.print(F("&entry.566710584=")); // Pass/Fail/Status
+  Serial.print(F("&entry.882185102=Record Test Results")); // Add test results
+  Serial.print(F("&entry.1879785912=")); // Pass/Fail/Status
   if (failnum) {Serial.print("FAIL");}
   else if (passnum == testnum) {Serial.print("PASS");}
   else {Serial.print("INCOMPLETE");}
-  Serial.print(F("&entry.893422998=("));Serial.print(fastPinD); // Port D measurements
+  Serial.print(F("&entry.1656234522=("));Serial.print(fastPinD); // Port D measurements
   Serial.print(",");Serial.print(fastValD);
   Serial.print(",");Serial.print(slowPinD);
   Serial.print(",");Serial.print(slowValD);Serial.print(")");
-  Serial.print(F("&entry.1229366360=("));Serial.print(fastPinB); // Port B measurements
+  Serial.print(F("&entry.1272501077=("));Serial.print(fastPinB); // Port B measurements
   Serial.print(",");Serial.print(fastValB);
   Serial.print(",");Serial.print(slowPinB);
   Serial.print(",");Serial.print(slowValB);Serial.print(")");
-  Serial.print(F("&entry.2038080670=("));Serial.print(highPinC); // Port C measurements
+  Serial.print(F("&entry.525544221=("));Serial.print(highPinC); // Port C measurements
   Serial.print(",");Serial.print(highValC);
   Serial.print(",");Serial.print(lowPinC);
   Serial.print(",");Serial.print(lowValC);Serial.print(")");
-  Serial.print(F("&entry.1025676851=("));Serial.print(highXrefh); // Ext Ref measurements
+  Serial.print(F("&entry.51020830=("));Serial.print(highXrefh); // Ext Ref measurements
   Serial.print(",");Serial.print(lowXrefh);
   Serial.print(",");Serial.print(highXrefl);
   Serial.print(",");Serial.print(lowXrefl);Serial.print(")");
   Serial.println();
   Serial.flush();
+
 
  #ifdef INCLUDE_DEBUG
   for (uint8_t i = 0; i<numTestDebug && i<numFailFlags; i++) {
