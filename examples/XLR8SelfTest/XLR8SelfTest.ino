@@ -289,6 +289,17 @@ void setup() {
   // Report results across serial
   XLR8Info myXLR8;
   Serial.begin(115200);
+  // Check if it looks like the correct MHz setting is chosen under Tools->FPGA Image
+  uint8_t ubrr0lCurrent = UBRR0L;
+  uint8_t ubrr115200baud = myXLR8.getUBRR115200();
+  UBRR0L = ubrr115200baud; // Adjust speed if it wasn't set correctly so we don't see gibberish on serial monitor
+  Serial.println("***************");
+  if (abs(ubrr0lCurrent - ubrr115200baud) > 1) { // +/- 1 on UBRR setting usually still works
+    Serial.println("Error: Change Tools->FPGA Image to a selection with the following MHz");
+  }
+  printImageName(Serial);
+  Serial.println("***************");
+  Serial.flush();
   Serial.print("XLR8 Hardware Version Number = ");
   Serial.println(myXLR8.getXLR8Version());
   if (myXLR8.isVersionMixed()) {Serial.println("  Mixed version, lowest reported");}
@@ -462,3 +473,14 @@ ISR(TIMER1_CAPT_vect) {
   }
 } 
 
+// Print FPGA image name in format that matches Tools->FPGA Image selection
+void printImageName(Stream &s) {
+  s.print("FPGA Image: ");
+  s.print(myXLR8.getClockMHz());
+  s.print(" MHz ");
+  if (myXLR8.hasXLR8FloatAddSubMult()) {s.print(F("Float "));}
+  if (myXLR8.hasXLR8Servo())           {s.print(F("Servo "));}
+  if (myXLR8.hasXLR8NeoPixel())        {s.print(F("NeoPixel "));}
+  s.print(" 1.0.");
+  s.println(myXLR8.getXLR8Version());
+}

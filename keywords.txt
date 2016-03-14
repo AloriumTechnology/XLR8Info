@@ -18,6 +18,7 @@ getChipId	KEYWORD2
 getDesignConfig	KEYWORD2
 getImageNum	KEYWORD2
 getClockMHz	KEYWORD2
+getUBRR115200	KEYWORD2
 hasFullProgMem	KEYWORD2
 getXBEnables	KEYWORD2
 hasXLR8FloatAddSubMult	KEYWORD2

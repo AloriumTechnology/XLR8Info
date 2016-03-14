@@ -83,6 +83,7 @@ uint8_t XLR8Info::getClockMHz(void) { // in bits[2:1], 0=16MHz, 1=32MHz, 2=64MHz
   if (designConfig & _BV(1) ) {return 32;}
   return 16;
 }
+uint8_t XLR8Info::getUBRR115200(void) {return CLKSPD;}
 bool XLR8Info::hasFullProgMem(void) {return (designConfig >> 3) & 1;}
 uint32_t XLR8Info::getXBEnables(void)  {return XBEnables;}
 bool  XLR8Info::hasXLR8FloatAddSubMult(void) {return (XBEnables >> 0) & 1;}

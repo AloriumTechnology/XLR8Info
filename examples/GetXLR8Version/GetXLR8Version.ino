@@ -15,26 +15,15 @@ volatile uint16_t timestamp[SAMPLES];
 XLR8Info myXLR8;
 
 void setup() {
-  // Try a couple "wrong speeds" to help people figure out if they have a 
-  //  Tools->FPGA Image selection that doesn't match what's actually on the board
-  //  
-  Serial.begin(57600);
-  Serial.println("***************");
-  Serial.println("Error, Change Tools->FPGA Image to a selection with the following MHz");
-  printImageName(Serial);
-  Serial.println("***************");
-  Serial.flush();
-  Serial.begin(230400);
-  Serial.println();
-  Serial.println("***************");
-  Serial.println("Error, Change Tools->FPGA Image to a selection with the following MHz");
-  printImageName(Serial);
-  Serial.println("***************");
-  Serial.flush();
   Serial.begin(115200);
-  Serial.println();
-  Serial.println();
+  // Check if it looks like the correct MHz setting is chosen under Tools->FPGA Image
+  uint8_t ubrr0lCurrent = UBRR0L;
+  uint8_t ubrr115200baud = myXLR8.getUBRR115200();
+  UBRR0L = ubrr115200baud; // Adjust speed if it wasn't set correctly so we don't see gibberish on serial monitor
   Serial.println("***************");
+  if (abs(ubrr0lCurrent - ubrr115200baud) > 1) { // +/- 1 on UBRR setting usually still works
+    Serial.println("Error: Change Tools->FPGA Image to a selection with the following MHz");
+  }
   printImageName(Serial);
   Serial.println("***************");
   Serial.flush();
@@ -42,7 +31,6 @@ void setup() {
   Serial.println(myXLR8.getXLR8Version());
   if (myXLR8.isVersionMixed()) {Serial.println("  Mixed version, lowest reported");}
   if (myXLR8.isVersionModified()) {Serial.println("  Modified working copy");}
-  if (myXLR8.isVersionClean()) {Serial.println("  Clean working copy");}
   Serial.print("XLR8 CID = 0x");
   Serial.println(myXLR8.getChipId(),HEX);
   Serial.print("DesignConfig = 0x");
@@ -88,7 +76,8 @@ void setup() {
   Serial.println();
   Serial.println(F("To help improve our products, please paste the followig URL into a web browser, add any notes, and click submit"));
   Serial.print(F("https://docs.google.com/forms/d/1GCmN3hRF-fnkr0J8K8HBrYvmuhmz6y94ViadHgobeRQ/viewform?"));
-  Serial.print(F("entry.498366088="));Serial.print(F("(optional)")); // Board Number
+  Serial.print(F("entry.882185102="));Serial.print(F("Log+GetXLR8Version+Results")); // Board Number
+  Serial.print(F("&entry.451752966=XLR8"));
   Serial.print(F("&entry.110701079=0x"));Serial.print(myXLR8.getChipId(),HEX); // Chip ID
   Serial.print(F("&entry.328279444="));Serial.print(myXLR8.getXLR8Version()); // subversion
   Serial.print(F("&entry.1881676735="));Serial.print(myXLR8.getDesignConfig()); // Design Config
@@ -97,8 +86,7 @@ void setup() {
   Serial.print(F("&entry.545646289="));Serial.print(intOscSpeed); // Speed Test
   Serial.println();
   Serial.flush();
-  
-  
+   
 }
 
 void loop() {
@@ -110,6 +98,7 @@ ISR(TIMER1_CAPT_vect) {
   }
 } 
 
+// Print FPGA image name in format that matches Tools->FPGA Image selection
 void printImageName(Stream &s) {
   s.print("FPGA Image: ");
   s.print(myXLR8.getClockMHz());

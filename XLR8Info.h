@@ -42,6 +42,7 @@ class XLR8Info {
   uint8_t  getDesignConfig(void);
   uint8_t  getImageNum(void);
   uint8_t  getClockMHz(void);
+  uint8_t  getUBRR115200(void);
   bool  hasFullProgMem(void);
   uint32_t getXBEnables(void);
   bool  hasXLR8FloatAddSubMult(void);
