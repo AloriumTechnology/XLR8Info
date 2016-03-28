@@ -1,5 +1,5 @@
 /* XLR8SelfTest
- Copyright (c) 2015-2016 Alorim Technology.  All right reserved.
+ Copyright (c) 2015-2016 Alorium Technology.  All rights reserved.
  by Matt Weber (linkedin.com/in/mattweber0) of
  Alorium Technology (info@aloriumtech.com)
  Does a simple self test of an alorium XLR8 board which should
@@ -88,6 +88,7 @@ int areadel[6];
 const int SAMPLES = 129;  // Set to 0 if trying this sketch on non-XLR8 board
 volatile uint8_t index;
 volatile uint16_t timestamp[SAMPLES];
+XLR8Info myXLR8;
 
 void setup() {
  #ifdef INCLUDE_DEBUG
@@ -287,7 +288,6 @@ void setup() {
 
   
   // Report results across serial
-  XLR8Info myXLR8;
   Serial.begin(115200);
   // Check if it looks like the correct MHz setting is chosen under Tools->FPGA Image
   uint8_t ubrr0lCurrent = UBRR0L;
@@ -337,7 +337,7 @@ void setup() {
   TIMSK1 |=(1<<ICIE1); //enable input capture interrupt
   while (index < SAMPLES);
   TIMSK1 &= ~(1<<ICIE1); //disable input capture interrupt
-  float intOscSpeed = F_CPU*1024.0*(SAMPLES-1)/(timestamp[SAMPLES-1] - timestamp[0])/1000000.0;
+  float intOscSpeed = myXLR8.getClockMHz()*1024.0*(SAMPLES-1)/(timestamp[SAMPLES-1] - timestamp[0]);
   Serial.print("Int Osc = ");
   Serial.print(intOscSpeed);
   Serial.println(" MHz");
