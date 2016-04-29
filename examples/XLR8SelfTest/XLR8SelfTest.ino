@@ -85,7 +85,7 @@ int areadeh[6];
 int areadel[6];
 #endif
 
-const int SAMPLES = 129;  // Set to 0 if trying this sketch on non-XLR8 board
+const int SAMPLES = 65;  // Set to 0 if trying this sketch on non-XLR8 board
 volatile uint8_t index;
 volatile uint16_t timestamp[SAMPLES];
 XLR8Info myXLR8;
@@ -292,8 +292,12 @@ void setup() {
   // Check if it looks like the correct MHz setting is chosen under Tools->FPGA Image
   uint8_t ubrr0lCurrent = UBRR0L;
   uint8_t ubrr115200baud = myXLR8.getUBRR115200();
+  if (ubrr115200baud == 0) {ubrr115200baud = UBRR0L;} // Handle early hardware that didn't have getUBRR115200() function
   UBRR0L = ubrr115200baud; // Adjust speed if it wasn't set correctly so we don't see gibberish on serial monitor
   Serial.println("***************");
+  if (myXLR8.hasICSPVccGndSwap()) {
+    Serial.println("Warning: Do not use ICSP header on this board. The ICSP Vcc and Gnd pins are swapped");
+  }
   if (abs(ubrr0lCurrent - ubrr115200baud) > 1) { // +/- 1 on UBRR setting usually still works
     Serial.println("Error: Change Tools->FPGA Image to a selection with the following MHz");
   }
@@ -304,7 +308,6 @@ void setup() {
   Serial.println(myXLR8.getXLR8Version());
   if (myXLR8.isVersionMixed()) {Serial.println("  Mixed version, lowest reported");}
   if (myXLR8.isVersionModified()) {Serial.println("  Modified working copy");}
-  if (myXLR8.isVersionClean()) {Serial.println("  Clean working copy");}
   Serial.print("XLR8 CID = 0x");
   Serial.println(myXLR8.getChipId(),HEX);
   Serial.print("DesignConfig = 0x");
@@ -367,36 +370,36 @@ void setup() {
   // Post results to our product improvement page
   Serial.println();
   Serial.println(F("To help improve our products, please paste the followig URL into a web browser, add any notes, and click submit"));
-  Serial.print(F("https://docs.google.com/forms/d/1GCmN3hRF-fnkr0J8K8HBrYvmuhmz6y94ViadHgobeRQ/viewform?"));
-  Serial.print(F("entry.498366088="));Serial.print(F("(optional)")); // Board Number
-  Serial.print(F("&entry.110701079=0x"));Serial.print(myXLR8.getChipId(),HEX); // Chip ID
-  Serial.print(F("&entry.328279444="));Serial.print(myXLR8.getXLR8Version()); // subversion
-  Serial.print(F("&entry.1881676735="));Serial.print(myXLR8.getDesignConfig()); // Design Config
-  Serial.print(F("&entry.821741284="));Serial.print(myXLR8.getXBEnables()); // XB Enable
-  Serial.print(F("&entry.1215707535="));Serial.print("XLR8SelfTest"); // Notes
-  Serial.print(F("&entry.545646289="));Serial.print(intOscSpeed); // Speed Test
+  Serial.print(F("https://docs.google.com/forms/d/1Kr5rUasuYZljwIHejOdolLPamY_D2oiVbMp-5TCS_rA/viewform?"));
+  Serial.print(F("entry.451752966=XLR8"));
+  //Serial.print(F("entry.498366088="));Serial.print(F("(optional)")); // Board Number
+  Serial.print(F("&entry.890063407=0x"));Serial.print(myXLR8.getChipId(),HEX); // Chip ID
+  Serial.print(F("&entry.2079216950="));Serial.print(myXLR8.getXLR8Version()); // subversion
+  Serial.print(F("&entry.2053805059="));Serial.print(myXLR8.getDesignConfig()); // Design Config
+  Serial.print(F("&entry.1880574867="));Serial.print(myXLR8.getXBEnables()); // XB Enable
+  Serial.print(F("&entry.1879785912="));Serial.print("XLR8SelfTest"); // Notes
+  Serial.print(F("&entry.1425449363="));Serial.print(intOscSpeed); // Speed Test
   Serial.print(F("&entry.1561823473="));Serial.print(vccRead); // 5V supply measurement
-  Serial.print(F("&entry.882185102=Record Test Results")); // Add test results
-  Serial.print(F("&entry.1879785912=")); // Pass/Fail/Status
+  Serial.print(F("&entry.1803617150=")); // Pass/Fail/Status
   if (failnum) {Serial.print("FAIL");}
   else if (passnum == testnum) {Serial.print("PASS");}
   else {Serial.print("INCOMPLETE");}
-  Serial.print(F("&entry.1656234522=("));Serial.print(fastPinD); // Port D measurements
+  Serial.print(F("&entry.1656234522={"));Serial.print(fastPinD); // Port D measurements
   Serial.print(",");Serial.print(fastValD);
   Serial.print(",");Serial.print(slowPinD);
-  Serial.print(",");Serial.print(slowValD);Serial.print(")");
-  Serial.print(F("&entry.1272501077=("));Serial.print(fastPinB); // Port B measurements
+  Serial.print(",");Serial.print(slowValD);Serial.print("}");
+  Serial.print(F("&entry.1272501077={"));Serial.print(fastPinB); // Port B measurements
   Serial.print(",");Serial.print(fastValB);
   Serial.print(",");Serial.print(slowPinB);
-  Serial.print(",");Serial.print(slowValB);Serial.print(")");
-  Serial.print(F("&entry.525544221=("));Serial.print(highPinC); // Port C measurements
+  Serial.print(",");Serial.print(slowValB);Serial.print("}");
+  Serial.print(F("&entry.525544221={"));Serial.print(highPinC); // Port C measurements
   Serial.print(",");Serial.print(highValC);
   Serial.print(",");Serial.print(lowPinC);
-  Serial.print(",");Serial.print(lowValC);Serial.print(")");
-  Serial.print(F("&entry.51020830=("));Serial.print(highXrefh); // Ext Ref measurements
+  Serial.print(",");Serial.print(lowValC);Serial.print("}");
+  Serial.print(F("&entry.51020830={"));Serial.print(highXrefh); // Ext Ref measurements
   Serial.print(",");Serial.print(lowXrefh);
   Serial.print(",");Serial.print(highXrefl);
-  Serial.print(",");Serial.print(lowXrefl);Serial.print(")");
+  Serial.print(",");Serial.print(lowXrefl);Serial.print("}");
   Serial.println();
   Serial.flush();
 

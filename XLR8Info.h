@@ -49,6 +49,7 @@ class XLR8Info {
   bool  hasXLR8FloatDiv(void);
   bool  hasXLR8Servo(void);
   bool  hasXLR8NeoPixel(void);
+  bool  hasICSPVccGndSwap(void);
   void  enableInternalOscPin(void);
   void  disableInternalOscPin(void);
   private:

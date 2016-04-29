@@ -21,6 +21,7 @@
  --------------------------------------------------------------------*/
 
 #include "XLR8Info.h"
+#include <avr/pgmspace.h>
 
 #define XLR8VERS      _SFR_MEM16(0xd4)
 #define XLR8VERSL     _SFR_MEM8(0xd4)
@@ -92,6 +93,24 @@ bool  XLR8Info::hasXLR8FloatDiv(void) {
 }
 bool  XLR8Info::hasXLR8Servo(void) {return (XBEnables >> 1) & 1;}
 bool  XLR8Info::hasXLR8NeoPixel(void) {return (XBEnables >> 2) & 1;}
+bool  XLR8Info::hasICSPVccGndSwap(void) {
+  // List of chip IDs from boards that have Vcc and Gnd swapped on the ICSP header
+  //   Chip ID of affected parts are 0x????6E00. Store the ???? part
+  const static char cidTable[] PROGMEM = {0xC88F,  0x08B7,  0xA877,  0xF437,
+    0x94BF,  0x88D8,  0xB437,  0x94D7,  0x38BF,  0x145F,  0x288F,  0x28CF,
+    0x543F,  0x0837,  0xA8B7,  0x748F,  0x8477,  0xACAF,  0x14A4,  0x0C50,
+    0x084F,  0x0810,  0x0CC0,  0x540F,  0x1897,  0x48BF,  0x285F,  0x8C77,
+    0xE877,  0xE49F,  0x2837,  0xA82F,  0x043F,  0x88BF,  0xF48F,  0x88F7,
+    0x1410,  0xCC8F,  0xA84F,  0xB808,  0x8437,  0xF4C0,  0xD48F,  0x5478,
+    0x080F,  0x54D7,  0x1490,  0x88AF,  0x2877,  0xA8CF,  0xB83F,  0x1860,
+    0x38BF};
+  uint32_t chipId = getChipId();
+  for (int i=0;i< sizeof(cidTable)/sizeof(cidTable[0]);i++) {
+    uint32_t cidtoTest = (cidTable[i] << 16) + 0x6E00;
+    if (chipId = cidtoTest) {return true;}
+  }
+  return false;
+}
 
 void  XLR8Info::enableInternalOscPin(void) {CLKSPD |= 1;} // send internal oscillator to pin
 void  XLR8Info::disableInternalOscPin(void) {CLKSPD &= ~1;}

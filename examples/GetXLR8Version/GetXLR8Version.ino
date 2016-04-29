@@ -8,8 +8,7 @@
  Set serial monitor to 115200 baud
 */
   
-
-#define SAMPLES 129
+#define SAMPLES 65
 
 // SIM_SAMPLES for simulation only
 #define SIM_SAMPLES 10
@@ -24,10 +23,12 @@ void setup() {
   // Check if it looks like the correct MHz setting is chosen under Tools->FPGA Image
   uint8_t ubrr0lCurrent = UBRR0L;
   uint8_t ubrr115200baud = myXLR8.getUBRR115200();
- 
+  if (ubrr115200baud < 3) {ubrr115200baud = UBRR0L;} // Handle early hardware that didn't have getUBRR115200() function
   UBRR0L = ubrr115200baud; // Adjust speed if it wasn't set correctly so we don't see gibberish on serial monitor
   if (verbose) Serial.println("***************");
-
+  if (myXLR8.hasICSPVccGndSwap()) {
+    Serial.println("Warning: Do not use ICSP header on this board. The ICSP Vcc and Gnd pins are swapped");
+  }
   if (abs(ubrr0lCurrent - ubrr115200baud) > 1) { // +/- 1 on UBRR setting usually still works
     Serial.println("Error: Change Tools->FPGA Image to a selection with the following MHz");
   }
@@ -123,6 +124,6 @@ void printImageName(Stream &s) {
   if (myXLR8.hasXLR8FloatAddSubMult()) {s.print(F("Float "));}
   if (myXLR8.hasXLR8Servo())           {s.print(F("Servo "));}
   if (myXLR8.hasXLR8NeoPixel())        {s.print(F("NeoPixel "));}
-  s.print(" 1.0.");
+  s.print(" r");
   s.println(myXLR8.getXLR8Version());
 }
