@@ -42,7 +42,7 @@ void setup() {
   Serial.print("XLR8 CID = 0x");
   Serial.println(myXLR8.getChipId(),HEX);
   Serial.print("DesignConfig = 0x");
-  Serial.println(myXLR8.getDesignConfig());
+  Serial.println(myXLR8.getDesignConfig(),HEX);
   Serial.print("Image = ");
   Serial.println(myXLR8.getImageNum());
   Serial.print("Clock = ");
@@ -127,3 +127,4 @@ void printImageName(Stream &s) {
   s.print(" r");
   s.println(myXLR8.getXLR8Version());
 }
+

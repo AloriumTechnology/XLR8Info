@@ -107,7 +107,7 @@ bool  XLR8Info::hasICSPVccGndSwap(void) {
   uint32_t chipId = getChipId();
   for (int i=0;i< sizeof(cidTable)/sizeof(cidTable[0]);i++) {
     uint32_t cidtoTest = (cidTable[i] << 16) + 0x6E00;
-    if (chipId = cidtoTest) {return true;}
+    if (chipId == cidtoTest) {return true;}
   }
   return false;
 }
