@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------
  Copyright (c) 2015 Alorim Technology.  All right reserved.
  This library queries information from an XLR8 board.
- Written by Matt Weber (linkedin.com/in/mattweberdesign) of
+ Written by Matt Weber (support@aloriumtech.com) of
  Alorium Technology (info@aloriumtech.com)
  
  
@@ -78,21 +78,26 @@ uint32_t XLR8Info::getChipId(void) {
   return temp2;
 };
 uint8_t XLR8Info::getDesignConfig(void) {return designConfig;}
-uint8_t XLR8Info::getImageNum(void) {return !(designConfig & 1);} // factory=1 is on image=0
+uint8_t XLR8Info::getImageNum(void)     {return !(designConfig & 1);} // factory=1 is on image=0
 uint8_t XLR8Info::getClockMHz(void) { // in bits[2:1], 0=16MHz, 1=32MHz, 2=64MHz, 3=reserved
   if (designConfig & _BV(2) ) {return 64;}
   if (designConfig & _BV(1) ) {return 32;}
   return 16;
 }
+bool XLR8Info::hasFullProgMem(void)     {return (designConfig >> 3) & 1;}
+bool XLR8Info::hasFastPLL(void)         {return (designConfig >> 4) & 1;}
+bool XLR8Info::hasSnoADCSwizzle(void)   {return (designConfig >> 5) & 1;}
+bool XLR8Info::hasM16Max10(void)        {return (designConfig >> 6) & 1;}
 uint8_t XLR8Info::getUBRR115200(void) {return CLKSPD;}
-bool XLR8Info::hasFullProgMem(void) {return (designConfig >> 3) & 1;}
-uint32_t XLR8Info::getXBEnables(void)  {return XBEnables;}
+uint32_t XLR8Info::getXBEnables(void) {return XBEnables;}
 bool  XLR8Info::hasXLR8FloatAddSubMult(void) {return (XBEnables >> 0) & 1;}
 bool  XLR8Info::hasXLR8FloatDiv(void) {
   return ((XBEnables >> 0) & 1) && ((getXLR8Version() < 363) || (getXLR8Version() >= 815));
 }
 bool  XLR8Info::hasXLR8Servo(void) {return (XBEnables >> 1) & 1;}
 bool  XLR8Info::hasXLR8NeoPixel(void) {return (XBEnables >> 2) & 1;}
+bool  XLR8Info::hasXLR8Quad(void) {return (XBEnables >> 3) & 1;}
+bool  XLR8Info::hasXLR8PID(void) {return (XBEnables >> 4) & 1;}
 bool  XLR8Info::hasICSPVccGndSwap(void) {
   // List of chip IDs from boards that have Vcc and Gnd swapped on the ICSP header
   //   Chip ID of affected parts are 0x????6E00. Store the ???? part

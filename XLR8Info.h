@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------
  Copyright (c) 2015 Alorim Technology.  All right reserved.
  This library queries information from an XLR8 board.
- Written by Matt Weber (linkedin.com/in/mattweberdesign) of
+ Written by Matt Weber (support@aloriumtech.com) of
  Alorium Technology (info@aloriumtech.com)
 
  
@@ -44,11 +44,16 @@ class XLR8Info {
   uint8_t  getClockMHz(void);
   uint8_t  getUBRR115200(void);
   bool  hasFullProgMem(void);
+  bool hasFastPLL(void);
+  bool hasSnoADCSwizzle(void);
+  bool hasM16Max10(void);
   uint32_t getXBEnables(void);
   bool  hasXLR8FloatAddSubMult(void);
   bool  hasXLR8FloatDiv(void);
   bool  hasXLR8Servo(void);
   bool  hasXLR8NeoPixel(void);
+  bool  hasXLR8Quad(void);
+  bool  hasXLR8PID(void);
   bool  hasICSPVccGndSwap(void);
   void  enableInternalOscPin(void);
   void  disableInternalOscPin(void);

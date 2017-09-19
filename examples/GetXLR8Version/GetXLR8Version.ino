@@ -1,7 +1,7 @@
 #include <XLR8Info.h>
 /* GetXLR8Version
  Copyright (c) 2015-2016 Alorium Technology.  All rights reserved.
- by Matt Weber (linkedin.com/in/mattweber0) of
+ by Matt Weber (support@aloriumtech.com) of
  Alorium Technology (info@aloriumtech.com)
  Reports information about the FPGA design currently
   loaded on the XLR8 board
@@ -25,36 +25,50 @@ void setup() {
   uint8_t ubrr115200baud = myXLR8.getUBRR115200();
   if (ubrr115200baud < 3) {ubrr115200baud = UBRR0L;} // Handle early hardware that didn't have getUBRR115200() function
   UBRR0L = ubrr115200baud; // Adjust speed if it wasn't set correctly so we don't see gibberish on serial monitor
-  if (verbose) Serial.println("***************");
+  if (verbose) Serial.println("============================================================");
   if (myXLR8.hasICSPVccGndSwap()) {
     Serial.println("Warning: Do not use ICSP header on this board. The ICSP Vcc and Gnd pins are swapped");
   }
-  if (abs(ubrr0lCurrent - ubrr115200baud) > 1) { // +/- 1 on UBRR setting usually still works
-    Serial.println("Error: Change Tools->FPGA Image to a selection with the following MHz");
+  //sjp// Commented this out for production since Console output would be garbage anyway if the Baud
+  //sjp// rate wasn't set correctly antway. Its just confusing.
+  //  if (abs(ubrr0lCurrent - ubrr115200baud) > 1) { // +/- 1 on UBRR setting usually still works
+  //    Serial.println("Error: Change Tools->FPGA Image to a selection with the following MHz");
+  //  }
+  if (verbose) {
+    if (myXLR8.hasSnoADCSwizzle()) {Serial.println("Board Type: Sno");}
+    else {Serial.println("Board Type: XLR8");}
   }
   if (verbose) printImageName(Serial);
-  if (verbose) Serial.println("***************");
+  if (verbose) Serial.println("============================================================");
   Serial.flush();
-  Serial.print("XLR8 Hardware Version Number = ");
+  Serial.print("XLR8 Hardware Version = ");
   Serial.println(myXLR8.getXLR8Version());
   if (myXLR8.isVersionMixed()) {Serial.println("  Mixed version, lowest reported");}
   if (myXLR8.isVersionModified()) {Serial.println("  Modified working copy");}
-  Serial.print("XLR8 CID = 0x");
+  Serial.print("XLR8 CID              = 0x");
   Serial.println(myXLR8.getChipId(),HEX);
-  Serial.print("DesignConfig = 0x");
+  if (verbose) Serial.println("------------------------------------------------------------");
+  Serial.print("Design Configuration  = 0x");
   Serial.println(myXLR8.getDesignConfig(),HEX);
-  Serial.print("Image = ");
+  Serial.print("  Image     = ");
   Serial.println(myXLR8.getImageNum());
-  Serial.print("Clock = ");
+  Serial.print("  Clock     = ");
   Serial.print(myXLR8.getClockMHz());
   Serial.println(" MHz");
-  Serial.print("XB_ENABLE = 0x");
+  if (myXLR8.hasFastPLL()) {Serial.println("  PLL Speed = 50MHz");}
+  else  {Serial.println("  PLL Speed = 16MHz");}
+  if (myXLR8.hasM16Max10()) {Serial.println("  FPGA Size = M16");}
+  else  {Serial.println("  FPGA Size = M08");}
+  if (verbose) Serial.println("------------------------------------------------------------");
+  Serial.print("XB_ENABLE             = 0x");
   Serial.println(myXLR8.getXBEnables(),HEX);
   if (verbose) {
-    if (myXLR8.hasXLR8FloatAddSubMult()) {Serial.println(F("Has Floating Point Add, Subtract, and Multiply"));}
-    if (myXLR8.hasXLR8FloatDiv())        {Serial.println(F("Has Floating Point Divide"));}
-    if (myXLR8.hasXLR8Servo())           {Serial.println(F("Has Servo XB"));}
-    if (myXLR8.hasXLR8NeoPixel())        {Serial.println(F("Has NeoPixel XB"));}
+    if (myXLR8.hasXLR8FloatAddSubMult()) {Serial.println(F("  Has Floating Point Add, Subtract, and Multiply"));}
+    if (myXLR8.hasXLR8FloatDiv())        {Serial.println(F("  Has Floating Point Divide"));}
+    if (myXLR8.hasXLR8Servo())           {Serial.println(F("  Has Servo XB"));}
+    if (myXLR8.hasXLR8NeoPixel())        {Serial.println(F("  Has NeoPixel XB"));}
+    if (myXLR8.hasXLR8Quad())            {Serial.println(F("  Has Quadrature XB"));}
+    if (myXLR8.hasXLR8PID())             {Serial.println(F("  Has PID XB"));}
   }
 
   // XLR8 has an internal oscillator that doesn't get used for anything and varies with
@@ -81,9 +95,11 @@ void setup() {
 
   intOscSpeed =  myXLR8.getClockMHz()*1024.0*(sample_idx)/(timestamp[sample_idx] - timestamp[0]);
  
+  if (verbose) Serial.println("------------------------------------------------------------");
   Serial.print("Int Osc = ");
   Serial.print(intOscSpeed);
   Serial.println(" MHz");
+  if (verbose) Serial.println("------------------------------------------------------------");
   Serial.flush();
   myXLR8.disableInternalOscPin(); // send internal osc divide by 1024 to pin 8
   PRR |= (1 << 4); // power down the internal oscillator
