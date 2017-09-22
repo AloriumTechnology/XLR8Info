@@ -140,7 +140,9 @@ void printImageName(Stream &s) {
   if (myXLR8.hasXLR8FloatAddSubMult()) {s.print(F("Float "));}
   if (myXLR8.hasXLR8Servo())           {s.print(F("Servo "));}
   if (myXLR8.hasXLR8NeoPixel())        {s.print(F("NeoPixel "));}
-  s.print(" r");
+  if (myXLR8.hasXLR8Quad())            {s.print(F("Quad "));}
+  if (myXLR8.hasXLR8PID())             {s.print(F("PID "));}
+  s.print("r");
   s.println(myXLR8.getXLR8Version());
 }
 
