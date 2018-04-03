@@ -4,30 +4,30 @@
 # Class
 #######################################
 
-XLR8Info	KEYWORD1
+XLR8Info KEYWORD1
 
 #######################################
 # Methods and Functions 
 #######################################	
 
-getXLR8Version	KEYWORD2
-isVersionClean	KEYWORD2
-isVersionMixed	KEYWORD2
-isVersionModified	KEYWORD2
-getChipId	KEYWORD2
-getDesignConfig	KEYWORD2
-getImageNum	KEYWORD2
-getClockMHz	KEYWORD2
-getUBRR115200	KEYWORD2
-hasFullProgMem	KEYWORD2
-getXBEnables	KEYWORD2
-hasXLR8FloatAddSubMult	KEYWORD2
-hasXLR8FloatDiv	KEYWORD2
-hasXLR8Servo	KEYWORD2
-hasXLR8NeoPixel	KEYWORD2
+getXLR8Version KEYWORD2
+isVersionClean KEYWORD2
+isVersionMixed KEYWORD2
+isVersionModified KEYWORD2
+getChipId KEYWORD2
+getDesignConfig KEYWORD2
+getImageNum KEYWORD2
+getClockMHz KEYWORD2
+getUBRR115200 KEYWORD2
+hasFullProgMem KEYWORD2
+getXBEnables KEYWORD2
+hasXLR8FloatAddSubMult KEYWORD2
+hasXLR8FloatDiv KEYWORD2
+hasXLR8Servo KEYWORD2
+hasXLR8NeoPixel KEYWORD2
 hasICSPVccGndSwap KEYWORD2
-enableInternalOscPin	KEYWORD2
-disableInternalOscPin	KEYWORD2
+enableInternalOscPin KEYWORD2
+disableInternalOscPin KEYWORD2
 
 #######################################
 # Constants
