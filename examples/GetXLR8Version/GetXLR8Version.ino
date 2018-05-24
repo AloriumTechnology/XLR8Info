@@ -19,6 +19,8 @@ XLR8Info myXLR8;
 // GPIOR0 != 0: simulation: dont print out as much
 void setup() {
   boolean verbose = (GPIOR0 == 0);
+  uint8_t fsize;
+  uint32_t chipid, designconfig, xbenables;
   Serial.begin(115200);
   // Check if it looks like the correct MHz setting is chosen under Tools->FPGA Image
   uint8_t ubrr0lCurrent = UBRR0L;
@@ -36,7 +38,13 @@ void setup() {
   //  }
   if (verbose) {
     if (myXLR8.hasSnoADCSwizzle()) {Serial.println("Board Type: Sno");}
-    else {Serial.println("Board Type: XLR8");}
+    else {
+      if (myXLR8.getFPGASize() == 8) {
+        Serial.println("Board Type: XLR8");
+      } else {
+        Serial.println("Board Type: Hinj");
+      }
+    }
   }
   if (verbose) printImageName(Serial);
   if (verbose) Serial.println("============================================================");
@@ -48,20 +56,17 @@ void setup() {
   Serial.print("XLR8 CID              = 0x");
   Serial.println(myXLR8.getChipId(),HEX);
   if (verbose) Serial.println("------------------------------------------------------------");
-  Serial.print("Design Configuration  = 0x");
-  Serial.println(myXLR8.getDesignConfig(),HEX);
-  Serial.print("  Image     = ");
-  Serial.println(myXLR8.getImageNum());
-  Serial.print("  Clock     = ");
-  Serial.print(myXLR8.getClockMHz());
-  Serial.println(" MHz");
-  if (myXLR8.hasFastPLL()) {Serial.println("  PLL Speed = 50MHz");}
-  else  {Serial.println("  PLL Speed = 16MHz");}
-  if (myXLR8.hasM16Max10()) {Serial.println("  FPGA Size = M16");}
-  else  {Serial.println("  FPGA Size = M08");}
+  Serial.print("Design Configuration  = 0x");Serial.println(myXLR8.getDesignConfig(),HEX);
+  Serial.print("  Image       = ");Serial.println(myXLR8.getImageNum());
+  Serial.print("  Clock       = ");Serial.print(myXLR8.getClockMHz());Serial.println("MHz");
+  if (myXLR8.hasFastPLL()) {
+    Serial.println("  PLL Speed   = 50MHz");}
+  else  {
+    Serial.println("  PLL Speed   = 16MHz");}
+  if (myXLR8.hasSnoADCSwizzle()) {Serial.println("  ADC Swizzle = True" );}
+  Serial.print("  FPGA Size   = M"); Serial.println(myXLR8.getFPGASize());
   if (verbose) Serial.println("------------------------------------------------------------");
-  Serial.print("XB_ENABLE             = 0x");
-  Serial.println(myXLR8.getXBEnables(),HEX);
+  Serial.print("XB_ENABLE             = 0x");Serial.println(myXLR8.getXBEnables(),HEX);
   if (verbose) {
     if (myXLR8.hasXLR8FloatAddSubMult()) {Serial.println(F("  Has Floating Point Add, Subtract, and Multiply"));}
     if (myXLR8.hasXLR8FloatDiv())        {Serial.println(F("  Has Floating Point Divide"));}
@@ -70,7 +75,7 @@ void setup() {
     if (myXLR8.hasXLR8Quad())            {Serial.println(F("  Has Quadrature XB"));}
     if (myXLR8.hasXLR8PID())             {Serial.println(F("  Has PID XB"));}
   }
-
+  
   // XLR8 has an internal oscillator that doesn't get used for anything and varies with
   //  voltage, temperature, and transistor characteristics. Still, it may be interesting
   //  to see how fast it is running. It comes out on pin 8 so we can use timer/counter1
@@ -94,7 +99,6 @@ void setup() {
   uint8_t sample_idx = sample_limit - 1;
 
   intOscSpeed =  myXLR8.getClockMHz()*1024.0*(sample_idx)/(timestamp[sample_idx] - timestamp[0]);
- 
   if (verbose) Serial.println("------------------------------------------------------------");
   Serial.print("Int Osc = ");
   Serial.print(intOscSpeed);
@@ -140,7 +144,7 @@ void printImageName(Stream &s) {
   if (myXLR8.hasXLR8FloatAddSubMult()) {s.print(F("Float "));}
   if (myXLR8.hasXLR8Servo())           {s.print(F("Servo "));}
   if (myXLR8.hasXLR8NeoPixel())        {s.print(F("NeoPixel "));}
-  if (myXLR8.hasXLR8Quad())            {s.print(F("Quad "));}
+  if (myXLR8.hasXLR8Quad())            {s.print(F("Quadrature "));}
   if (myXLR8.hasXLR8PID())             {s.print(F("PID "));}
   s.print("r");
   s.println(myXLR8.getXLR8Version());

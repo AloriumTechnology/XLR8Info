@@ -1,6 +1,6 @@
 /* XLR8SelfTest
  Copyright (c) 2015-2016 Alorium Technology.  All rights reserved.
- by Matt Weber (linkedin.com/in/mattweber0) of
+ by Matt Weber (support@aloriumtech.com) of
  Alorium Technology (info@aloriumtech.com)
  Does a simple self test of an alorium XLR8 board which should
   detect many (not all) possible manufacturing flaws
