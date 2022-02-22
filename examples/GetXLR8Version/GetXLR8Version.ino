@@ -7,6 +7,36 @@
   loaded on the XLR8 board
  Set serial monitor to 115200 baud
 */
+// The DESIGN_CONFIG parameter/reg is used to configure many aspects
+// of the design and can be read by a sketch and inspected to
+// determine what type of board and what type of image is being
+// used. The definition of the fields in the DESIGN_CONFIG is shown
+// below.
+
+// DESIGN_CONFIG = {
+//     8'd0,  // [31:24] - Board type      0 = Not specified, figure out via other fields
+//     9'd0,  // [23:15] - reserved
+//     8'h2,  //  [14]   - Compact,        0 = Analog/Flash,    1 = Compact
+//     8'h8,  // [13:6]  - MAX10 Size,     ex: 0x8 = M08, 0x32 = M50
+//     1'b0,  //   [5]   - ADC_SWIZZLE,    0 = XLR8,            1 = Sno
+//     1'b0,  //   [4]   - PLL Speed,      0 = 16MHz PLL,       1 = 50Mhz PLL
+//     1'b1,  //   [3]   - Force 16K PMEM, 0 = FPGA Dependent,  1 = 16K
+//     2'd0,  //  [2:1]  - Clock Speed,    0 = 16MHZ,           1 = 32MHz, 2 = 64MHz, 3=na
+//     1'b0   //   [0]   - FPGA Image,     0 = CFM Application, 1 = CFM Factory            
+// };
+//
+//   |------------+------------+-----------------------------------------|
+//   | Board Code | Board Type | Description                             |
+//   |------------+------------+-----------------------------------------|
+//   |     0      | Legacy     | use old methods to determine board type |
+//   |     1      | XLR8       | Original UNo compatible board           |
+//   |     2      | SNO        | First small form factor board           |
+//   |     3      | HINJ       | Big prototyping board                   |
+//   |     4      | BTBEE      | XBee form factor                        |
+//   |     5      | DE10LITE   | Terasic DE10-Lite board                 |
+//   |     6      | SNOM2      | Digikey MicroMod form factor            |
+//   |     7      | SNOEDGE    | Sno with DDR2 Edge connector            |
+//   |------------+------------+-----------------------------------------|
   
 #define SAMPLES 65
 
@@ -19,7 +49,7 @@ XLR8Info myXLR8;
 // GPIOR0 != 0: simulation: dont print out as much
 void setup() {
   boolean verbose = (GPIOR0 == 0);
-  uint8_t fsize;
+  uint8_t fsize, xbnum, xbi;
   uint32_t chipid, designconfig, xbenables;
   Serial.begin(115200);
   // Check if it looks like the correct MHz setting is chosen under Tools->FPGA Image
@@ -31,18 +61,46 @@ void setup() {
   if (myXLR8.hasICSPVccGndSwap()) {
     Serial.println("Warning: Do not use ICSP header on this board. The ICSP Vcc and Gnd pins are swapped");
   }
-  //sjp// Commented this out for production since Console output would be garbage anyway if the Baud
-  //sjp// rate wasn't set correctly antway. Its just confusing.
-  //  if (abs(ubrr0lCurrent - ubrr115200baud) > 1) { // +/- 1 on UBRR setting usually still works
-  //    Serial.println("Error: Change Tools->FPGA Image to a selection with the following MHz");
-  //  }
+
   if (verbose) {
-    if (myXLR8.hasSnoADCSwizzle()) {Serial.println("Board Type: Sno");}
-    else {
-      if (myXLR8.getFPGASize() == 8) {
-        Serial.println("Board Type: XLR8");
-      } else {
+    if (myXLR8.getBoardType()) { // DESIGN_CONFIG contains BOARD_TYPE field
+      switch (myXLR8.getBoardType()) {
+      case 1:
+        Serial.println("getBoardType(): XLR8");
+        break;
+      case 2:
+        Serial.println("Board Type: Sno");
+        break;
+      case 3:
         Serial.println("Board Type: Hinj");
+        break;
+      case 4:
+        // Known as BTBEE in the verilog, the product name is XGZ
+        Serial.println("Board Type: XGZ");
+        break;
+      case 5:
+        Serial.println("Board Type: DE10-Lite");
+        break;
+      case 6:
+        Serial.println("Board Type: Sno M2");
+        break;
+      case 7:
+        Serial.println("Board Type: Sno Edge");
+        break;
+      default:
+        Serial.print("Board Type: Unknown Board Type: ");
+        Serial.println(myXLR8.getBoardType());
+        break;
+      }
+    } else { // DESIGN_CONFIG does not contain BOARD_TYPE field
+      // Try to determine Board type from other fields
+      if (myXLR8.hasSnoADCSwizzle()) {Serial.println("Board Type: Sno");}
+      else {
+        if (myXLR8.getFPGASize() == 8) {
+          Serial.println("Board Type: XLR8");
+        } else {
+          Serial.println("Board Type: Hinj");
+        }
       }
     }
   }
@@ -55,6 +113,7 @@ void setup() {
   if (myXLR8.isVersionModified()) {Serial.println("  Modified working copy");}
   Serial.print("XLR8 CID              = 0x");
   Serial.println(myXLR8.getChipId(),HEX);
+
   if (verbose) Serial.println("------------------------------------------------------------");
   Serial.print("Design Configuration  = 0x");Serial.println(myXLR8.getDesignConfig(),HEX);
   Serial.print("  Image       = ");Serial.println(myXLR8.getImageNum());
@@ -65,17 +124,41 @@ void setup() {
     Serial.println("  PLL Speed   = 16MHz");}
   if (myXLR8.hasSnoADCSwizzle()) {Serial.println("  ADC Swizzle = True" );}
   Serial.print("  FPGA Size   = M"); Serial.println(myXLR8.getFPGASize());
+
   if (verbose) Serial.println("------------------------------------------------------------");
-  Serial.print("XB_ENABLE             = 0x");Serial.println(myXLR8.getXBEnables(),HEX);
-  if (verbose) {
-    if (myXLR8.hasXLR8FloatAddSubMult()) {Serial.println(F("  Has Floating Point Add, Subtract, and Multiply"));}
-    if (myXLR8.hasXLR8FloatDiv())        {Serial.println(F("  Has Floating Point Divide"));}
-    if (myXLR8.hasXLR8Servo())           {Serial.println(F("  Has Servo XB"));}
-    if (myXLR8.hasXLR8NeoPixel())        {Serial.println(F("  Has NeoPixel XB"));}
-    if (myXLR8.hasXLR8Quad())            {Serial.println(F("  Has Quadrature XB"));}
-    if (myXLR8.hasXLR8PID())             {Serial.println(F("  Has PID XB"));}
+  if (myXLR8.getXBEnables() == 0) {
+    Serial.println("No Builtin XB Enabled");  
+  } else {
+    Serial.print("Builtin XB ENABLE             = 0x");Serial.println(myXLR8.getXBEnables(),HEX);
+    if (verbose) {
+      if (myXLR8.hasXLR8FloatAddSubMult()) {Serial.println(F("  Has Floating Point Add, Subtract, and Multiply"));}
+      if (myXLR8.hasXLR8FloatDiv())        {Serial.println(F("  Has Floating Point Divide"));}
+      if (myXLR8.hasXLR8Servo())           {Serial.println(F("  Has Servo XB"));}
+      if (myXLR8.hasXLR8NeoPixel())        {Serial.println(F("  Has NeoPixel XB"));}
+      if (myXLR8.hasXLR8Quad())            {Serial.println(F("  Has Quadrature XB"));}
+      if (myXLR8.hasXLR8PID())             {Serial.println(F("  Has PID XB"));}
+    }
   }
-  
+
+  if (verbose) Serial.println("------------------------------------------------------------");
+  if (!myXLR8.checkXBInfoValid()) {
+    Serial.println("OpenXLR8 Info Regs    = None");
+    //    Serial.print("myXLR8.getXBInfoVal(0xA5) = ");
+    //Serial.println(myXLR8.getXBInfoVal(0xA5));
+  } else {
+    xbnum = myXLR8.getXBInfoNumRegs();
+    Serial.print("OpenXLR8 Info Regs    = ");Serial.println(xbnum);
+    if (verbose) {
+      for (xbi=0; xbi<xbnum; xbi++) {
+        Serial.print("  Info Reg ");
+        Serial.print(xbi+1);
+        Serial.print(" = 0x");
+        Serial.println(myXLR8.getXBInfoNextVal(),HEX);
+      }
+    }
+  }
+  if (verbose) Serial.println("------------------------------------------------------------");
+
   // XLR8 has an internal oscillator that doesn't get used for anything and varies with
   //  voltage, temperature, and transistor characteristics. Still, it may be interesting
   //  to see how fast it is running. It comes out on pin 8 so we can use timer/counter1

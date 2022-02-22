@@ -25,9 +25,6 @@
  Wiring is really simple. Just wire from 3.3V to Aref and that's it.
 */
 
-// Enable this only if you have connected a jumper from 3.3V to Aref
-//#define EXTERNAL_ANALOG_TEST
-
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
@@ -245,7 +242,6 @@ void setup() {
     assert(analogVal >= minAreadil);
     assert(analogVal <= maxAreadil);
   }
-#ifdef EXTERNAL_ANALOG_TEST
   analogReference(EXTERNAL);
   for (uint8_t i = A0; i<=A5; i++) {
     pinMode(i,OUTPUT);
@@ -254,7 +250,7 @@ void setup() {
    #ifdef INCLUDE_DEBUG
     areadeh[i-A0]=analogVal;
    #endif
-    assert(analogVal >= minAreadeh); // This will fail if 3.3V and Aref are not connected
+    assert(analogVal >= minAreadeh);
     assert(analogVal <= maxAreadeh);
     if (analogVal > highXrefh) {
       highXrefh = analogVal;
@@ -277,7 +273,6 @@ void setup() {
     }
   }
   analogReference(DEFAULT);
-#endif
   uint16_t vccRead=analogRead(7); // Not a real pin, but tied to divider on 5V supply
   
    

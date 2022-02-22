@@ -20,6 +20,7 @@
   <http://www.gnu.org/licenses/>.
   --------------------------------------------------------------------*/
 
+
 #include "XLR8Info.h"
 #include <avr/pgmspace.h>
 
@@ -31,6 +32,7 @@
 #define CLKSPD        _SFR_IO8(0x29)
 #define XLR8VERS_OLD  _SFR_MEM16(0x90)
 #define FCFGCID_OLD   _SFR_MEM8(0xd8)
+#define XBINFO        _SFR_MEM8(0xFF)
 
 XLR8Info::XLR8Info(void) : designConfig(0),XBEnables(0) { // constructor
   // xlr8Version = (uint16_t)XLR8VERSL | ((uint16_t)XLR8VERSH << 8);
@@ -95,15 +97,6 @@ uint32_t XLR8Info::getChipId(void) {return chipId;}
 uint32_t XLR8Info::getDesignConfig(void) {return designConfig;}
 uint32_t XLR8Info::getXBEnables(void) {return XBEnables;}
 
-// DESIGN_CONFIG = {
-//     25'd0, // [31:14] :  reserved
-//     8'h8,  // [13:6] :  MAX10 Size,  ex: 0x8 = M08, 0x32 = M50
-//     1'b0,  //   [5]  :  ADC_SWIZZLE, 0 = XLR8,            1 = Sno
-//     1'b0,  //   [4]  :  PLL Speed,   0 = 16MHz PLL,       1 = 50Mhz PLL
-//     1'b1,  //   [3]  :  PMEM Size,   0 = 8K (Sim Kludge), 1 = 16K
-//     2'd0,  //  [2:1] :  Clock Speed, 0 = 16MHZ,           1 = 32MHz, 2 = 64MHz, 3=na
-//     1'b0   //   [0]  :  FPGA Image,  0 = CFM Application, 1 = CFM Factory
-// };
 uint8_t XLR8Info::getImageNum(void)     {return !(designConfig & 1);} // factory=1 is on image=0
 uint8_t XLR8Info::getClockMHz(void) { // in bits[2:1], 0=16MHz, 1=32MHz, 2=64MHz, 3=reserved
   if (designConfig & _BV(2) ) {return 64;}
@@ -135,6 +128,10 @@ uint8_t  XLR8Info::getFPGASize(void)        {
     return (designConfig >> 6) & 0xff;
   }
 }
+uint8_t XLR8Info::getBoardType(void) {
+  return (designConfig >> 24);
+}
+
 uint8_t  XLR8Info::getUBRR115200(void)      {return CLKSPD;}
 bool     XLR8Info::hasXLR8FloatAddSubMult(void) {return (XBEnables >> 0) & 1;}
 
@@ -168,4 +165,30 @@ bool     XLR8Info::hasICSPVccGndSwap(void)  {
 
 void  XLR8Info::enableInternalOscPin(void) {CLKSPD |= 1;} // send internal oscillator to pin
 void  XLR8Info::disableInternalOscPin(void) {CLKSPD &= ~1;}
+
+// XB Info methods
+bool XLR8Info::checkXBInfoValid(void) {
+  XBINFO = 0xFC; // Set the XBINFO read address to XB_INFO_VALID_ADDR
+  // Check to see if the value returned is "XLR8"
+  if (XBINFO == 0x88) {       // "X" at address 0xFC
+    if (XBINFO == 0x76) {     // "L" at address 0xFD
+      if (XBINFO == 0x82) {   // "R" at address 0xFE
+        if (XBINFO == 0x56) { // "8" at address 0xFF
+          return true;}}}}
+    return false;
+}
+
+uint8_t XLR8Info::getXBInfoNumRegs(void) {
+  XBINFO = 0x00; // Set the read address
+  return XBINFO;
+}
+
+uint8_t XLR8Info::getXBInfoVal(uint8_t addr) {
+  XBINFO = addr; // Set the read address
+  return XBINFO;
+}
+
+uint8_t XLR8Info::getXBInfoNextVal(void) {return XBINFO;}
+
+
 

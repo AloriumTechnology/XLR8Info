@@ -51,6 +51,7 @@ class XLR8Info {
   bool     hasSnoADCSwizzle(void);
   bool     hasM16Max10(void);
   uint8_t  getFPGASize(void);
+  uint8_t  getBoardType(void);
   bool     hasXLR8FloatAddSubMult(void);
   bool     hasXLR8FloatDiv(void);
   bool     hasXLR8Servo(void);
@@ -60,6 +61,10 @@ class XLR8Info {
   bool     hasICSPVccGndSwap(void);
   void     enableInternalOscPin(void);
   void     disableInternalOscPin(void);
+  bool     checkXBInfoValid(void);
+  uint8_t  getXBInfoNumRegs(void);
+  uint8_t  getXBInfoVal(uint8_t addr);
+  uint8_t  getXBInfoNextVal(void);
  private:
   uint16_t xlr8Version;
   uint32_t chipId;
