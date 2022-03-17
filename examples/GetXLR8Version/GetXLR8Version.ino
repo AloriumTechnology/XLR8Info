@@ -35,7 +35,8 @@
 //   |     4      | BTBEE      | XBee form factor                        |
 //   |     5      | DE10LITE   | Terasic DE10-Lite board                 |
 //   |     6      | SNOM2      | Digikey MicroMod form factor            |
-//   |     7      | SNOEDGE    | Sno with DDR2 Edge connector            |
+//   |     7      | SNOEDGE    | Sno with DDR2 Edge connector, M25 FPGA  |
+//   |     8      | SNOEDGE50  | Sno with DDR2 Edge connector, M50 FPGA  |
 //   |------------+------------+-----------------------------------------|
   
 #define SAMPLES 65
@@ -86,6 +87,9 @@ void setup() {
         break;
       case 7:
         Serial.println("Board Type: Sno Edge");
+        break;
+      case 8:
+        Serial.println("Board Type: Sno Edge 50");
         break;
       default:
         Serial.print("Board Type: Unknown Board Type: ");
