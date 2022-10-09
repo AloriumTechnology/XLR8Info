@@ -146,7 +146,7 @@ bool     XLR8Info::hasXLR8PID(void)         {return (XBEnables >> 4) & 1;}
 bool     XLR8Info::hasICSPVccGndSwap(void)  {
   // List of chip IDs from boards that have Vcc and Gnd swapped on the ICSP header
   //   Chip ID of affected parts are 0x????6E00. Store the ???? part
-  const static char cidTable[] PROGMEM =
+  const static unsigned int cidTable[] PROGMEM =
     {0xC88F,  0x08B7,  0xA877,  0xF437,
      0x94BF,  0x88D8,  0xB437,  0x94D7,  0x38BF,  0x145F,  0x288F,  0x28CF,
      0x543F,  0x0837,  0xA8B7,  0x748F,  0x8477,  0xACAF,  0x14A4,  0x0C50,
@@ -157,7 +157,7 @@ bool     XLR8Info::hasICSPVccGndSwap(void)  {
      0x38BF};
   uint32_t chipId = getChipId();
   for (int i=0;i< sizeof(cidTable)/sizeof(cidTable[0]);i++) {
-    uint32_t cidtoTest = (cidTable[i] << 16) + 0x6E00;
+    uint32_t cidtoTest = ((uint32_t)cidTable[i] << 16) + 0x6E00;
     if (chipId == cidtoTest) {return true;}
   }
   return false;
